@@ -1,5 +1,6 @@
 package uk.co.chrisjenx.calligraphy;
 
+import android.graphics.Typeface;
 import android.text.TextUtils;
 
 /**
@@ -18,7 +19,13 @@ public class CalligraphyConfig {
      *                             passing null will default to the device font-family.
      */
     public static void initDefault(String defaultFontAssetPath) {
-        mInstance = new CalligraphyConfig(defaultFontAssetPath);
+        if (CalligraphyUtils.isRegexFontAssetPath(defaultFontAssetPath)) {
+            String[] generatedFontPaths = CalligraphyUtils.generateFontAssetPaths(defaultFontAssetPath);
+            mInstance = new CalligraphyConfig(generatedFontPaths[0], generatedFontPaths[1],
+                    generatedFontPaths[2], generatedFontPaths[3]);
+        } else {
+            mInstance = new CalligraphyConfig(defaultFontAssetPath);
+        }
     }
 
     /**
@@ -40,7 +47,30 @@ public class CalligraphyConfig {
      * @see #initDefault(int)
      */
     public static void initDefault(String defaultFontAssetPath, int defaultAttributeId) {
-        mInstance = new CalligraphyConfig(defaultFontAssetPath, defaultAttributeId);
+        if (CalligraphyUtils.isRegexFontAssetPath(defaultFontAssetPath)) {
+            String[] generatedFontPaths = CalligraphyUtils.generateFontAssetPaths(defaultFontAssetPath);
+            mInstance = new CalligraphyConfig(generatedFontPaths[0], generatedFontPaths[1],
+                    generatedFontPaths[2], generatedFontPaths[3], defaultAttributeId);
+        } else {
+            mInstance = new CalligraphyConfig(defaultFontAssetPath, defaultAttributeId);
+        }
+    }
+
+    /**
+     * Define the defaults fonts and custom attribute to lookup globally. All paths will
+     * reference files in the asserts folder, e.g. "assets/fonts/Roboto-light.ttf"
+     *
+     * @param defaultFontAssetPath path to the font to be used for regular text
+     * @param defaultFontBoldAssetPath path to the font to be used for bold text
+     * @param defaultFontItalicAssetPath path to the font to be used for italic text
+     * @param defaultFontBoldItalicAssetPath path to the font to be used for bold italic text
+     * @param defaultAttributeId the custom attribute to look for
+     */
+    public static void initDefault(String defaultFontAssetPath, String defaultFontBoldAssetPath,
+                                   String defaultFontItalicAssetPath, String defaultFontBoldItalicAssetPath,
+                                   int defaultAttributeId) {
+        mInstance = new CalligraphyConfig(defaultFontAssetPath, defaultFontBoldAssetPath,
+                defaultFontItalicAssetPath, defaultFontBoldItalicAssetPath, defaultAttributeId);
     }
 
     static CalligraphyConfig get() {
@@ -51,23 +81,40 @@ public class CalligraphyConfig {
 
 
     private final String mFontPath;
+    private final String mFontPathBold;
+    private final String mFontPathItalic;
+    private final String mFontPathBoldItalic;
     private final boolean mIsFontSet;
     private final int mAttrId;
 
     private CalligraphyConfig() {
-        this(null, -1);
+        this(null, null, null, null, -1);
     }
 
     private CalligraphyConfig(int attrId) {
-        this(null, attrId);
+        this(null, null, null, null, attrId);
     }
 
     private CalligraphyConfig(String defaultFontAssetPath) {
-        this(defaultFontAssetPath, -1);
+        this(defaultFontAssetPath, null, null, null, -1);
     }
 
-    private CalligraphyConfig(String defaultFontAssetPath, int attrId) {
+    private CalligraphyConfig(String defaultFontAssetPath, int defaultAttributeId) {
+        this(defaultFontAssetPath, null, null, null, defaultAttributeId);
+    }
+
+    private CalligraphyConfig(String defaultFontAssetPath, String defaultFontBoldAssetPath,
+                              String defaultFontItalicAssetPath, String defaultFontBoldItalicAssetPath) {
+        this(defaultFontAssetPath, defaultFontBoldAssetPath, defaultFontItalicAssetPath, defaultFontBoldItalicAssetPath, -1);
+    }
+
+    private CalligraphyConfig(String defaultFontAssetPath, String defaultFontBoldAssetPath,
+                              String defaultFontItalicAssetPath, String defaultFontBoldItalicAssetPath,
+                              int attrId) {
         this.mFontPath = defaultFontAssetPath;
+        this.mFontPathBold = defaultFontBoldAssetPath;
+        this.mFontPathItalic = defaultFontItalicAssetPath;
+        this.mFontPathBoldItalic = defaultFontBoldItalicAssetPath;
         mIsFontSet = !TextUtils.isEmpty(defaultFontAssetPath);
         mAttrId = attrId != -1 ? attrId : -1;
     }
@@ -75,8 +122,59 @@ public class CalligraphyConfig {
     /**
      * @return mFontPath for text views might be null
      */
+    String getStyledFontPath(int style) {
+        switch (style) {
+            case Typeface.NORMAL:
+                return mFontPath;
+            case Typeface.BOLD:
+                if (!TextUtils.isEmpty(mFontPathBold)) {
+                    return mFontPathBold;
+                } else {
+                    return mFontPath;
+                }
+            case Typeface.ITALIC:
+                if (!TextUtils.isEmpty(mFontPathItalic)) {
+                    return mFontPathItalic;
+                } else {
+                    return mFontPath;
+                }
+            case Typeface.BOLD_ITALIC:
+                if (!TextUtils.isEmpty(mFontPathBoldItalic)) {
+                    return mFontPathBoldItalic;
+                } else {
+                    return mFontPath;
+                }
+            default:
+                return mFontPath;
+        }
+    }
+
+    /**
+     * @return mFontPath for text views might be null
+     */
     String getFontPath() {
         return mFontPath;
+    }
+
+    /**
+     * @return mFontPathBold for text views, might be null
+     */
+    String getBoldFontPath() {
+        return mFontPathBold;
+    }
+
+    /**
+     * @return mFontPathItalic for text views, might be null
+     */
+    String getItalicFontPath() {
+        return mFontPathItalic;
+    }
+
+    /**
+     * @return mFontPathBoldItalic for text views, might be null
+     */
+    String getBoldItalicFontPath() {
+        return mFontPathBoldItalic;
     }
 
     /**

@@ -22,6 +22,12 @@ import android.widget.TextView;
  */
 public final class CalligraphyUtils {
 
+    public static final String REGEX_ENDING = "-*";
+    public static final String REGULAR_ENDING = "-Regular";
+    public static final String BOLD_ENDING = "-Bold";
+    public static final String ITALIC_ENDING = "-Italic";
+    public static final String BOLD_ITALIC_ENDING = "-BoldItalic";
+
     /**
      * Applies a custom typeface span to the text.
      *
@@ -113,14 +119,14 @@ public final class CalligraphyUtils {
         return applyFontToTextView(textView, typeface, deferred);
     }
 
-    static void applyFontToTextView(final Context context, final TextView textView, final CalligraphyConfig config) {
-        applyFontToTextView(context, textView, config, false);
+    static void applyFontToTextView(final Context context, final TextView textView, final CalligraphyConfig config, int style) {
+        applyFontToTextView(context, textView, config, style, false);
     }
 
-    static void applyFontToTextView(final Context context, final TextView textView, final CalligraphyConfig config, boolean deferred) {
+    static void applyFontToTextView(final Context context, final TextView textView, final CalligraphyConfig config, int style, boolean deferred) {
         if (context == null || textView == null || config == null) return;
         if (!config.isFontSet()) return;
-        applyFontToTextView(context, textView, config.getFontPath(), deferred);
+        applyFontToTextView(context, textView, config.getStyledFontPath(style), deferred);
     }
 
     /**
@@ -132,16 +138,16 @@ public final class CalligraphyUtils {
      * @param textViewFont nullable, will use Default Config if null or fails to find the
      *                     defined font.
      */
-    public static void applyFontToTextView(final Context context, final TextView textView, final CalligraphyConfig config, final String textViewFont) {
-        applyFontToTextView(context, textView, config, textViewFont, false);
+    public static void applyFontToTextView(final Context context, final TextView textView, final CalligraphyConfig config, int style, final String textViewFont) {
+        applyFontToTextView(context, textView, config, textViewFont, style, false);
     }
 
-    static void applyFontToTextView(final Context context, final TextView textView, final CalligraphyConfig config, final String textViewFont, boolean deferred) {
+    static void applyFontToTextView(final Context context, final TextView textView, final CalligraphyConfig config, final String textViewFont, int style, boolean deferred) {
         if (context == null || textView == null || config == null) return;
         if (!TextUtils.isEmpty(textViewFont) && applyFontToTextView(context, textView, textViewFont, deferred)) {
             return;
         }
-        applyFontToTextView(context, textView, config, deferred);
+        applyFontToTextView(context, textView, config, style, deferred);
     }
 
     /**
@@ -308,6 +314,23 @@ public final class CalligraphyUtils {
             }
         }
         return null;
+    }
+
+    public static boolean isRegexFontAssetPath(String fontAssetPath) {
+        if (fontAssetPath != null) {
+            return fontAssetPath.contains(REGEX_ENDING);
+        } else {
+            return false;
+        }
+    }
+
+    public static String[] generateFontAssetPaths(String defaultFontAssetPath) {
+        String[] fontAssetPaths = new String[4];
+        fontAssetPaths[0] = defaultFontAssetPath.replace(REGEX_ENDING, REGULAR_ENDING);
+        fontAssetPaths[1] = defaultFontAssetPath.replace(REGEX_ENDING, BOLD_ENDING);
+        fontAssetPaths[2] = defaultFontAssetPath.replace(REGEX_ENDING, ITALIC_ENDING);
+        fontAssetPaths[3] = defaultFontAssetPath.replace(REGEX_ENDING, BOLD_ITALIC_ENDING);
+        return fontAssetPaths;
     }
 
     private CalligraphyUtils() {

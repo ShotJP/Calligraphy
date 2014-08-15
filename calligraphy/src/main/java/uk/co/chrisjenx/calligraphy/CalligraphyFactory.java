@@ -1,6 +1,8 @@
 package uk.co.chrisjenx.calligraphy;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -137,6 +139,12 @@ class CalligraphyFactory implements LayoutInflater.Factory {
             // Try to get typeface attribute value
             // Since we're not using namespace it's a little bit tricky
 
+            TypedArray values = context.obtainStyledAttributes(attrs, new int[] {android.R.attr.textStyle});
+            int style = 0;
+            if (values.hasValue(0)) {
+                style = values.getInt(0, 0);
+            }
+
             // Try view xml attributes
             String textViewFont = CalligraphyUtils.pullFontPathFromView(context, attrs, mAttributeId);
 
@@ -160,7 +168,7 @@ class CalligraphyFactory implements LayoutInflater.Factory {
             }
 
             final boolean deferred = matchesResourceIdName(view, ACTION_BAR_TITLE) || matchesResourceIdName(view, ACTION_BAR_SUBTITLE);
-            CalligraphyUtils.applyFontToTextView(context, (TextView) view, CalligraphyConfig.get(), textViewFont, deferred);
+            CalligraphyUtils.applyFontToTextView(context, (TextView) view, CalligraphyConfig.get(), textViewFont, style, deferred);
         }
     }
 
