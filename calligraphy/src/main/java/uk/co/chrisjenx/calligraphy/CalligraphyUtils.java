@@ -22,7 +22,7 @@ import android.widget.TextView;
  */
 public final class CalligraphyUtils {
 
-    public static final String REGEX_ENDING = "-*";
+    public static final String REGEX_INDICATOR = "-*";
     public static final String REGULAR_ENDING = "-Regular";
     public static final String BOLD_ENDING = "-Bold";
     public static final String ITALIC_ENDING = "-Italic";
@@ -318,7 +318,7 @@ public final class CalligraphyUtils {
 
     public static boolean isRegexFontAssetPath(String fontAssetPath) {
         if (fontAssetPath != null) {
-            return fontAssetPath.contains(REGEX_ENDING);
+            return fontAssetPath.contains(REGEX_INDICATOR);
         } else {
             return false;
         }
@@ -326,10 +326,10 @@ public final class CalligraphyUtils {
 
     public static String[] generateFontAssetPaths(String defaultFontAssetPath) {
         String[] fontAssetPaths = new String[4];
-        fontAssetPaths[0] = defaultFontAssetPath.replace(REGEX_ENDING, REGULAR_ENDING);
-        fontAssetPaths[1] = defaultFontAssetPath.replace(REGEX_ENDING, BOLD_ENDING);
-        fontAssetPaths[2] = defaultFontAssetPath.replace(REGEX_ENDING, ITALIC_ENDING);
-        fontAssetPaths[3] = defaultFontAssetPath.replace(REGEX_ENDING, BOLD_ITALIC_ENDING);
+        fontAssetPaths[0] = defaultFontAssetPath.replace(REGEX_INDICATOR, REGULAR_ENDING);
+        fontAssetPaths[1] = defaultFontAssetPath.replace(REGEX_INDICATOR, BOLD_ENDING);
+        fontAssetPaths[2] = defaultFontAssetPath.replace(REGEX_INDICATOR, ITALIC_ENDING);
+        fontAssetPaths[3] = defaultFontAssetPath.replace(REGEX_INDICATOR, BOLD_ITALIC_ENDING);
         return fontAssetPaths;
     }
 
